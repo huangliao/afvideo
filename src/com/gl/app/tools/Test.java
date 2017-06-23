@@ -20,5 +20,8 @@ public static void main(String[] args){
 	//这是在浏览器上改的
 	//修改提交 再改一次 //浏览器来一发 哈哈
 	
+	System.out.println(1/5);
+	System.out.println(5%5);
+	
 }
 }

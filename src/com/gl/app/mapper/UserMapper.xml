@@ -10,25 +10,41 @@
 		<result property="password" column="password" />
 	</resultMap>
 
-	<insert id="addUser" useGeneratedKeys="true" keyProperty="id"  parameterType="user">
-		
+	<select id="getCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM user_table
+	</select>
+
+	<select id="isExitsName" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM user_table where username=#{username}
+	</select>
+
+	<insert id="addUser" useGeneratedKeys="true" keyProperty="id"
+		parameterType="user">
+
 		INSERT INTO user_table
 		(username,password)
 		VALUE
 		(#{userName},#{password})
 	</insert>
 	<select id="selectUser" parameterType="user" resultMap="result">
-		SELECT * FROM user_table u where u.username=#{userName} and
+		SELECT *
+		FROM user_table u where u.username=#{userName} and
 		password=#{password}
 	</select>
 
 	<select id="selectMenu" resultType="map">
-		SELECT * FROM menu_node where pid = #{pid}
+		SELECT * FROM menu_node where
+		pid = #{pid}
 	</select>
 
 	<select id="getAllUser" resultMap="result">
 		SELECT id,username,password
 		FROM user_table
+	</select>
+
+	<select id="getUserByPage" resultMap="result">
+		SELECT id,username,password
+		FROM user_table limit #{start} , #{size}
 	</select>
 
 	<select id="getUserById" parameterType="String" resultMap="result">
@@ -51,10 +67,13 @@
 	<update id="update" parameterType="user">
 		UPDATE user_table
 		<set>
-			<if test="userName != null ">userName = #{userName},</if>
+			<if test="userName != null ">username = #{userName},</if>
 			<if test="password != null ">password = #{password}</if>
 		</set>
-		WHERE ID = #{id}
+		WHERE id = #{id}
+		
+	<!-- update user_table set username=#{userName},password=#{password} where id=#{id} -->
+		
 	</update>
 
 </mapper>

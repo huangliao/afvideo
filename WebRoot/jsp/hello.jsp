@@ -36,17 +36,57 @@
 						</div>
 						<div class="form-group">
 							<label for="recipient-name" class="control-label">用户名:</label> <input
-								type="text" class="form-control" name="userName" id="userName">
+								type="text" class="form-control" name="userNameAdd"
+								id="userNameAdd">
+								<div id="isExitsName" class="alert hidden">用户名已经存在!</div>
 						</div>
 						<div class="form-group">
 							<label for="recipient-name" class="control-label">密码:</label> <input
-								type="text" class="form-control" name="password" id="password">
+								type="text" class="form-control" name="passwordAdd"
+								id="passwordAdd">
 						</div>
 					</form>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
 					<button type="button" class="btn btn-primary" onclick="addUser()">添加</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 模态框编辑（Modal） -->
+	<div class="modal fade" id="myModalEdit" tabindex="-1" role="dialog"
+		aria-labelledby="exampleModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title" id="exampleModalLabel">添加用户</h4>
+				</div>
+				<div class="modal-body">
+					<form id="form" method="post" action="${base}/user/register">
+						<div class="form-group">
+							<label for="recipient-name" class="control-label">ID:</label> <input
+								type="text" readonly="readonly" class="form-control" id="IDEdit"
+								value="***">
+						</div>
+						<div class="form-group">
+							<label for="recipient-name" class="control-label">用户名:</label> <input
+								type="text" class="form-control" id="userNameEdit">
+						</div>
+						<div class="form-group">
+							<label for="recipient-name" class="control-label">密码:</label> <input
+								type="text" class="form-control" id="passwordEdit">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" onclick="editUser()">修改</button>
 				</div>
 			</div>
 		</div>
@@ -113,28 +153,13 @@
 						</tr>
 					</thead>
 					<tbody id="tbbody">
-						<c:forEach items="${users}" var="user">
-							<tr>
-								<td>${user.id}</td>
-								<td>${user.userName}</td>
-								<td>${user.password}</td>
-								<td>-</td>
-								<td><button type='button' class='btn btn-default'>修改</button>
-									<button type='button' onclick='delAdmin(this)'
-										class='btn btn-danger'>删除</button></td>
-							</tr>
-						</c:forEach>
+
 
 					</tbody>
 				</table>
 				<div class="pagination">
-					<ul>
-						<li class="disabled"><a href="#">&laquo;</a></li>
-						<li class="active"><a href="#">1</a></li>
-						<li><a href="#">2</a></li>
-						<li><a href="#">3</a></li>
-						<li><a href="#">4</a></li>
-						<li><a href="#">&raquo;</a></li>
+					<ul id="pagelist">
+
 					</ul>
 				</div>
 			</div>
@@ -151,13 +176,171 @@
 	/*
 	 * 5种弹出框 success(v) error(x) warning(!) info(i) question(?)
 	 */
-	//查询所有用户 
-	function loadUser(){
+	 //是否数字
+	function isInteger(obj) {
+		return typeof obj === 'number' && obj % 1 === 0;
+	}
+
+	//页面加载时
+	$(function() {
+
+		loadUser(1);
+
+	});
+	//用户名是否存在
+	function isExitsName(){
+		var userName = $('#userNameAdd').val();
+		
+		$.ajax({
+			type : "post",
+			url : "${base}/user/isExitsName",
+			dataType : 'json',
+			data : {
+				'userName' : userName
+			},
+			success : function(data, text) {
+				if (data.state) {
+					$('#isExitsName').addClass('alert-success');
+				}else{
+					$('#isExitsName').addClass('alert-danger');
+				}
+				
+				var state = data.state ? 'success' : 'warning';
+
+				swal({
+					title : "提示!",
+					text : data.msg,
+					type : state
+				});
+
+			}
+
+		});
+		
+		
+		
 		
 		
 	}
-	 
-	 
+	
+	
+	//查询用户 
+	function loadUser(id) {
+		//第几页
+		var page = isInteger(id) ? id : $(id).text();
+		
+		$
+				.ajax({
+					type : "post",
+					url : "${base}/user/getByPage",
+					dataType : "json",
+					data : {
+						"page" : page,
+						"size" : 3
+					},
+					success : function(data, text) {
+						//console.log('2');
+						//alert(eval("("+data+")"));
+						console.log(JSON.stringify(data));
+						//成功
+						if (data.state) {
+							var strVar = "";
+							$
+									.each(
+											data.obj,
+											function(k, v) {
+												strVar += "<tr>\n";
+												strVar += "	<td>" + v.id
+														+ "<\/td>\n";
+												strVar += "	<td>" + v.userName
+														+ "<\/td>\n";
+												strVar += "	<td>" + v.password
+														+ "<\/td>\n";
+												strVar += "	<td>-<\/td>\n";
+												strVar += "	<td>\n";
+												strVar += "		<button type='button' onclick='showEdit(this)' class='btn btn-default'>修改<\/button>\n";
+												strVar += "		<button type='button' onclick='delAdmin(this)' class='btn btn-danger'>删除<\/button>\n";
+												strVar += "	<\/td>\n";
+												strVar += "<\/tr>\n";
+
+											});
+							$("#tbbody").html(strVar);
+
+							//底部页数
+							var pageVar = '<li class="disabled"><a href="javascript:void(0)">&laquo;</a></li>';
+							for (i = 1; i <= data.msg; i++) {
+								if (i == page) {
+									pageVar += '<li class="active"><a href="#" onclick="loadUser(this)">'
+											+ i + '</a></li>';
+								} else {
+									pageVar += '<li><a href="#" onclick="loadUser(this)">'
+											+ i + '</a></li>';
+								}
+							}
+							pageVar += '<li class="disabled"><a href="javascript:void(0)">&raquo;</a></li>';
+							$("#pagelist").html(pageVar);
+
+						} else {
+							swal({
+								title : "提示!",
+								text : data.msg,
+								type : 'warning'
+							});
+						}
+
+					}
+				});
+
+	}
+	function editUser() {
+
+		//var index = $(id).find('td:first').text();
+		//当前是第几页  
+		//var index = $('#pagelist').find('li').querySelector('.active').text();
+		//当前是第几页  修改完就查询第几页的内容
+		var index = $('#pagelist>.active').text();
+		var id = $('#IDEdit').val();
+		var userName = $('#userNameEdit').val();
+		var password = $('#passwordEdit').val();
+		$.ajax({
+			type : "post",
+			url : "${base}/user/update",
+			dataType : 'json',
+			data : {
+				'id' : id,
+				'userName' : userName,
+				'password' : password
+			},
+			success : function(data, text) {
+				if (data.state) {
+					$('#myModalEdit').modal('hide');
+					loadUser(parseInt(index));
+				}
+				var state = data.state ? 'success' : 'warning';
+
+				swal({
+					title : "提示!",
+					text : data.msg,
+					type : state
+				});
+
+			}
+
+		});
+
+	}
+	function showEdit(id) {
+		$('#myModalEdit').modal();
+
+		var uid = $(id).parents('tr').find('td:first').text();
+		var uname = $(id).parents('tr').children('td').eq(1).text();
+		var upwd = $(id).parents('tr').children('td').eq(2).text();
+		$('#IDEdit').val(uid);
+		$('#userNameEdit').val(uname);
+		$('#passwordEdit').val(upwd);
+
+	}
+
 	function showModal() {
 
 		$('#myModalAdd').modal();
@@ -166,8 +349,8 @@
 	function addUser() {
 		//$('#form').submit();
 
-		var name = $("#userName").val();
-		var pwd = $("#password").val();
+		var name = $("#userNameAdd").val();
+		var pwd = $("#passwordAdd").val();
 
 		$.ajax({
 			type : "post",

@@ -41,17 +41,88 @@ public class UserController {
 		return "hello";
 	}
 
+	@RequestMapping(value = "/isExitsName")
+	@ResponseBody
+	public String isExitsName(HttpServletRequest request) {
+
+		String userName = request.getParameter("userName");
+
+		int count = userMapper.isExitsName(userName);
+
+		MsgModel msg = null;
+		if (count > 0) {
+			msg = new MsgModel(false, "用户名已存在");
+		} else {
+			msg = new MsgModel(true, "用户名可以使用");
+		}
+
+		return msg.toJson();
+	}
+
+	@RequestMapping(value = "/update")
+	@ResponseBody
+	public String update(HttpServletRequest request) {
+		// 更改数据
+		int id = Integer.parseInt(request.getParameter("id"));
+		String userName = request.getParameter("userName");
+		String password = request.getParameter("password");
+		User user = new User();
+		user.setId(id);
+		user.setUserName(userName);
+		user.setPassword(password);
+		// 获取影响行数
+
+		int infRow = userMapper.update(user);
+		System.out.println("行数->" + infRow);
+		MsgModel msg = null;
+		if (infRow > 0) {
+			msg = new MsgModel(true, "修改成功");
+			System.out.println("修改成功");
+		} else {
+			msg = new MsgModel(false, "修改失败");
+			System.out.println("修改失败");
+		}
+
+		return msg.toJson();
+	}
+
+	@RequestMapping(value = "getByPage")
+	@ResponseBody
+	public String getByPage(HttpServletRequest request) {
+		// 获取查询页数和每页大小
+		int page = Integer.parseInt(request.getParameter("page"));
+		int size = Integer.parseInt(request.getParameter("size"));
+
+		List<User> list = userMapper.getUserByPage((page - 1) * size, size);
+		MsgModel msg = null;
+		// 总记录数
+		int countNum = userMapper.getCount();
+		// 总页数
+		int countPage = countNum < size ? 1 : countNum % size == 0 ? countNum
+				/ size : countNum / size + 1;
+		// 输出总页数
+		// System.out.println("总页数:" + countPage);
+
+		if (list != null) {
+			msg = new MsgModel(true, countPage + "", list);
+		} else {
+			msg = new MsgModel(false, "查询失败");
+		}
+		return msg.toJson();
+	}
+
 	@RequestMapping(value = "/welcome")
 	public ModelAndView hello() {
 		ModelAndView mv = new ModelAndView("hello");
-		List<User> list = userMapper.getAllUser();
-		mv.addObject("users", list);
+		// List<User> list = userMapper.getAllUser();
+		// mv.addObject("users", list);
 
 		return mv;
 	}
 
 	@RequestMapping(value = "/register")
-	public ModelAndView register(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView register(HttpServletRequest request,
+			HttpServletResponse response) {
 		ModelAndView mv = new ModelAndView("hello");
 		String userName = request.getParameter("userName");
 		String password = request.getParameter("password");
@@ -118,7 +189,8 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/loginGo")
-	public ModelAndView loginGo(HttpServletRequest request, HttpServletResponse response, User user, Model model) {
+	public ModelAndView loginGo(HttpServletRequest request,
+			HttpServletResponse response, User user, Model model) {
 		ModelAndView mv = new ModelAndView("hello");
 		if (user == null || user.getUserName() == null) {
 			mv.setViewName("login");
@@ -130,7 +202,7 @@ public class UserController {
 		if (u != null) {
 
 			request.setAttribute("userName", u.getUserName());
-
+			System.out.println("----" + u.getUserName());
 			mv.setViewName("hello");
 		} else {
 			mv.setViewName("login");
@@ -139,7 +211,8 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/detail")
-	public String detail(ModelMap model, HttpServletRequest request, HttpServletResponse response) {
+	public String detail(ModelMap model, HttpServletRequest request,
+			HttpServletResponse response) {
 		String id = request.getParameter("id");
 		User user = userMapper.getUserById(id);
 		model.addAttribute("user", user);
@@ -147,7 +220,8 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/delete")
-	public ModelAndView delete(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView delete(HttpServletRequest request,
+			HttpServletResponse response) {
 		String id = request.getParameter("id");
 		userMapper.deleteById(id);
 		ModelAndView mv = new ModelAndView("hello");
@@ -157,26 +231,23 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/toupdate")
-	public String toUpdate(ModelMap model, HttpServletRequest request, HttpServletResponse response) {
+	public String toUpdate(ModelMap model, HttpServletRequest request,
+			HttpServletResponse response) {
 		String id = request.getParameter("id");
 		User user = userMapper.getUserById(id);
 		model.addAttribute("user", user);
 		return "update";
 	}
 
-	@RequestMapping(value = "/update")
-	public ModelAndView update(HttpServletRequest request, HttpServletResponse response) {
-		String id = request.getParameter("sid");
-		String userName = request.getParameter("userName");
-		String password = request.getParameter("password");
-		User user = new User();
-		// user.setId(id);
-		user.setUserName(userName);
-		user.setPassword(password);
-		userMapper.update(user);
-		ModelAndView mv = new ModelAndView("hello");
-		List<User> list = userMapper.getAllUser();
-		mv.addObject("users", list);
-		return mv;
-	}
+	/*
+	 * @RequestMapping(value = "/update") public ModelAndView
+	 * update(HttpServletRequest request, HttpServletResponse response) { String
+	 * id = request.getParameter("sid"); String userName =
+	 * request.getParameter("userName"); String password =
+	 * request.getParameter("password"); User user = new User(); //
+	 * user.setId(id); user.setUserName(userName); user.setPassword(password);
+	 * userMapper.update(user); ModelAndView mv = new ModelAndView("hello");
+	 * List<User> list = userMapper.getAllUser(); mv.addObject("users", list);
+	 * return mv; }
+	 */
 }
