@@ -1,14 +1,8 @@
 package com.gl.app.tools;
 
-import java.io.IOException;
 import java.util.UUID;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.gl.app.entity.MsgModel;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class Test {
@@ -24,7 +18,7 @@ public static void main(String[] args){
 
 	//	System.out.println(new ObjectMapper().writeValueAsString(m));
 	//这是在浏览器上改的
-	//修改提交
+	//修改提交 再改一次
 	
 }
 }
