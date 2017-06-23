@@ -50,6 +50,7 @@ public class UserController {
 		int count = userMapper.isExitsName(userName);
 
 		MsgModel msg = null;
+		
 		if (count > 0) {
 			msg = new MsgModel(false, "用户名已存在");
 		} else {

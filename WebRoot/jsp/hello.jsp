@@ -38,7 +38,7 @@
 							<label for="recipient-name" class="control-label">用户名:</label> <input
 								type="text" class="form-control" name="userNameAdd"
 								id="userNameAdd">
-								<div id="isExitsName" class="alert hidden">用户名已经存在!</div>
+								<div id="isExitsName" class="alert hidden  alert-dismissable">用户名已经存在!</div>
 						</div>
 						<div class="form-group">
 							<label for="recipient-name" class="control-label">密码:</label> <input
@@ -186,7 +186,18 @@
 
 		loadUser(1);
 
+		//当用户名失去焦点
+		$("#userNameAdd").blur(function(){
+			isExitsName();
+		});
+	//	$("#userNameAdd").focus(function(){
+	//		$('#isExitsName').addClass('hidden');
+	//	});
+		
 	});
+	
+
+	
 	//用户名是否存在
 	function isExitsName(){
 		var userName = $('#userNameAdd').val();
@@ -200,18 +211,14 @@
 			},
 			success : function(data, text) {
 				if (data.state) {
+					$('#isExitsName').removeClass('alert-danger');
 					$('#isExitsName').addClass('alert-success');
 				}else{
+					$('#isExitsName').removeClass('alert-success');
 					$('#isExitsName').addClass('alert-danger');
 				}
-				
-				var state = data.state ? 'success' : 'warning';
-
-				swal({
-					title : "提示!",
-					text : data.msg,
-					type : state
-				});
+				$('#isExitsName').removeClass('hidden');
+				$('#isExitsName').html(data.msg);
 
 			}
 
@@ -344,11 +351,17 @@
 	function showModal() {
 
 		$('#myModalAdd').modal();
+		$('#isExitsName').addClass('hidden');
 	}
 
 	function addUser() {
 		//$('#form').submit();
-
+		//已经存在
+		if($('#isExitsName').hasClass('alert-danger')){
+			alert('用户名已注册');
+			return false;
+		}
+		
 		var name = $("#userNameAdd").val();
 		var pwd = $("#passwordAdd").val();
 
