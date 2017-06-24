@@ -14,7 +14,7 @@
 <link href="${base}/assets/css/sweetalert2.min.css" rel="stylesheet">
 
 </head>
-<body>
+<body> 
 	<!-- 模态框（Modal） -->
 	<div class="modal fade" id="myModalAdd" tabindex="-1" role="dialog"
 		aria-labelledby="exampleModalLabel">
