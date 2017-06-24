@@ -236,15 +236,5 @@ public class UserController {
 		return "update";
 	}
 
-	/*
-	 * @RequestMapping(value = "/update") public ModelAndView
-	 * update(HttpServletRequest request, HttpServletResponse response) { String
-	 * id = request.getParameter("sid"); String userName =
-	 * request.getParameter("userName"); String password =
-	 * request.getParameter("password"); User user = new User(); //
-	 * user.setId(id); user.setUserName(userName); user.setPassword(password);
-	 * userMapper.update(user); ModelAndView mv = new ModelAndView("hello");
-	 * List<User> list = userMapper.getAllUser(); mv.addObject("users", list);
-	 * return mv; }
-	 */
+
 }
