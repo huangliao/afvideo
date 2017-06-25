@@ -2,6 +2,7 @@
     <wb-module deploy-name="Home2">
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/" source-path="/WebRoot"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/config"/>
         <property name="java-output-path" value="/Home2/build/classes"/>
         <property name="context-root" value="Home2"/>
     </wb-module>

@@ -10,6 +10,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,9 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @RequestMapping(value = "/upload")
 public class UpLoadController {
 
+	Logger log = Logger.getLogger(UpLoadController.class);
+	
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String showForm(ModelMap model) {
 
@@ -73,6 +77,10 @@ public class UpLoadController {
 		// 通过commonsMultipartFile 方法直接写文件
 		file.transferTo(newFile);
 
+		log.error("err msg");
+		log.info("info msg");
+		System.out.println("err mssff");
+		
 		long endTime = System.currentTimeMillis();
 		System.out.println("方法二运行时间:" + String.valueOf(endTime - startTime) + "ms");
 
