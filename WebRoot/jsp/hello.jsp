@@ -266,7 +266,7 @@
 												strVar += "	<td>-<\/td>\n";
 												strVar += "	<td>\n";
 												strVar += "		<button type='button' onclick='showEdit(this)' class='btn btn-default'>修改<\/button>\n";
-												strVar += "		<button type='button' onclick='delAdmin(this)' class='btn btn-danger'>删除<\/button>\n";
+												strVar += "		<button type='button' onclick='deleteUser(this)' class='btn btn-danger'>删除<\/button>\n";
 												strVar += "	<\/td>\n";
 												strVar += "<\/tr>\n";
 
@@ -299,6 +299,54 @@
 				});
 
 	}
+	
+	function deleteUser(id){
+		var index = $('#pagelist>.active').text();
+		var uid = $(id).parents('tr').find('td:first').text();
+		
+		swal({
+			title:'警告',
+			text:'您确定要删除吗',
+			type:'warning',
+			showCancelButton:true,
+			confirmButtonText:'确定',
+			cancelButtonText:'取消',
+			
+		}).then(function(isConfirm){
+			if(isConfirm){
+				
+				$.ajax({
+					type:'post',
+					url:'${base}/user/delete',
+					dataType:'json',
+					data:{
+						'uid':uid
+					},
+					success:function(data,text){
+						var state = data.state?'success':'warning';
+						swal({
+							title : "提示!",
+							text : data.msg,
+							type : state
+						});
+						
+					}
+				
+				});
+			}else{
+				
+			}
+			
+			
+			
+		});
+		
+		
+		
+		
+	}
+	
+	
 	function editUser() {
 
 		//var index = $(id).find('td:first').text();

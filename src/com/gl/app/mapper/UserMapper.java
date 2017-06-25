@@ -24,7 +24,7 @@ public interface UserMapper {
 	
 	public User getUserById(String id);
 
-	public void deleteById(String id);
+	public int deleteById(int id);
 
 	public int update(User user);
 

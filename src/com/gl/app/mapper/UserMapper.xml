@@ -58,7 +58,7 @@
 	<select id="selectUserById" parameterType="String" resultMap="result">
 		SELECT * FROM user_table where id = #{id}
 	</select>
-	<delete id="deleteById" parameterType="string">
+	<delete id="deleteById" parameterType="Integer">
 		DELETE FROM
 		user_table
 		WHERE ID = #{id}

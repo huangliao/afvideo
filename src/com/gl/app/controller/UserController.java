@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.gl.app.entity.MsgModel;
 import com.gl.app.entity.User;
 import com.gl.app.mapper.UserMapper;
+import com.gl.app.tools.MD5Utils;
 import com.google.gson.Gson;
 
 @Controller
@@ -46,7 +47,7 @@ public class UserController {
 		int count = userMapper.isExitsName(userName);
 
 		MsgModel msg = null;
-		
+
 		if (count > 0) {
 			msg = new MsgModel(false, "用户名已存在");
 		} else {
@@ -54,6 +55,25 @@ public class UserController {
 		}
 
 		return msg.toJson();
+	}
+
+	@RequestMapping(value = "/delete")
+	@ResponseBody
+	public String delete(HttpServletRequest request) {
+
+		int id = Integer.parseInt(request.getParameter("uid"));
+		MsgModel msg = null;
+		if (userMapper.deleteById(id) > 0) {
+			msg = new MsgModel(true, "删除成功");
+			System.out.println("0---ok");
+
+		} else {
+			msg = new MsgModel(false, "删除失败");
+			System.out.println("0---fail");
+		}
+
+		return msg.toJson();
+
 	}
 
 	@RequestMapping(value = "/update")
@@ -95,8 +115,7 @@ public class UserController {
 		// 总记录数
 		int countNum = userMapper.getCount();
 		// 总页数
-		int countPage = countNum < size ? 1 : countNum % size == 0 ? countNum
-				/ size : countNum / size + 1;
+		int countPage = countNum < size ? 1 : countNum % size == 0 ? countNum / size : countNum / size + 1;
 		// 输出总页数
 		// System.out.println("总页数:" + countPage);
 
@@ -118,8 +137,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/register")
-	public ModelAndView register(HttpServletRequest request,
-			HttpServletResponse response) {
+	public ModelAndView register(HttpServletRequest request, HttpServletResponse response) {
 		ModelAndView mv = new ModelAndView("hello");
 		String userName = request.getParameter("userName");
 		String password = request.getParameter("password");
@@ -151,7 +169,13 @@ public class UserController {
 	@ResponseBody
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 		String userName = request.getParameter("userName");
+		
+
+		
 		String password = request.getParameter("password");
+		//使用md5加密密码
+		password = MD5Utils.string2MD5(password);
+		System.out.println("加密后:"+password);
 		User user = new User();
 		user.setUserName(userName);
 		user.setPassword(password);
@@ -186,9 +210,13 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/loginGo")
-	public ModelAndView loginGo(HttpServletRequest request,
-			HttpServletResponse response, User user, Model model) {
+	public ModelAndView loginGo(HttpServletRequest request, HttpServletResponse response, User user, Model model) {
 		ModelAndView mv = new ModelAndView("hello");
+		
+		user.setPassword(MD5Utils.string2MD5(user.getPassword()));
+		//转换md5
+		System.out.println("--加密后:"+user.getPassword());
+		
 		if (user == null || user.getUserName() == null) {
 			mv.setViewName("login");
 			return mv;
@@ -207,34 +235,14 @@ public class UserController {
 		return mv;
 	}
 
-	@RequestMapping(value = "/detail")
-	public String detail(ModelMap model, HttpServletRequest request,
-			HttpServletResponse response) {
-		String id = request.getParameter("id");
-		User user = userMapper.getUserById(id);
-		model.addAttribute("user", user);
-		return "detail";
-	}
-
-	@RequestMapping(value = "/delete")
-	public ModelAndView delete(HttpServletRequest request,
-			HttpServletResponse response) {
+/*	@RequestMapping(value = "/delete")
+	public ModelAndView delete(HttpServletRequest request, HttpServletResponse response) {
 		String id = request.getParameter("id");
 		userMapper.deleteById(id);
 		ModelAndView mv = new ModelAndView("hello");
 		List<User> list = userMapper.getAllUser();
 		mv.addObject("users", list);
 		return mv;
-	}
-
-	@RequestMapping(value = "/toupdate")
-	public String toUpdate(ModelMap model, HttpServletRequest request,
-			HttpServletResponse response) {
-		String id = request.getParameter("id");
-		User user = userMapper.getUserById(id);
-		model.addAttribute("user", user);
-		return "update";
-	}
-
+	}*/
 
 }
